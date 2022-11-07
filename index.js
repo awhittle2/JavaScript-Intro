@@ -6,6 +6,7 @@
  * Email: whittlea@oregonstate.edu
  */
 
+// Function to add current posts to the posts array
 function initializePosts() {
     // Initial size of the array
     let size = document.getElementById("posts").childElementCount;
@@ -43,7 +44,7 @@ sellSomethingButton.addEventListener('click', function() {
 let modalClose = document.getElementById("modal-close");
 // Cancel button
 let modalCancel = document.getElementById("modal-cancel");
-// Text input fields
+// Text input fields (used to null the values)
 let pText = document.getElementById("post-text-input");
 let pPhoto = document.getElementById("post-photo-input");
 let pPrice = document.getElementById("post-price-input");
@@ -92,16 +93,6 @@ function getRadio() {
     } else if(document.getElementById("post-condition-poor").checked === true) {
         return "poor";
     }
-}
-
-// Extra credit function to check if city exists, if it doesn't then it adds it
-function checkCity() {
-    let cities = document.getElementById("filter-city");
-    let citySize = cities.childElementCount;
-
-    // for(let i = 0; i < citySize; i++) {
-    //     if(cities.children[i].text)
-    // }
 }
 
 // Function to create post and apply classes to it
@@ -197,10 +188,9 @@ modalAccept.addEventListener('click', function() {
     if(!modalBackdrop.classList.contains("hidden") && !sellSomethingModal.classList.contains("hidden")) {
         if(checkIsEmpty(postText, postPhoto, postPrice, postCity)) {
             createPost(postText, postPhoto, postPrice, postCity) // Create the post
-            // checkCity() // Checks if city is already in the list
             closeAndNull() // Null the data
         } else {
-            alert("Please fill out all entries before making a post")
+            alert("Please fill out all entries before making a post") // Send alert if not all fields are entered
         }      
     }
 })
@@ -211,17 +201,19 @@ let filterUpdate = document.getElementById("filter-update-button");
 // Function that returns what city the user wants to filter by
 function getFilterCity() {
     let filterCity = document.getElementById("filter-city");
+    // Get the number of cities
     let citySize = filterCity.childElementCount;
-
+    // Go through each city option and see which one is selected
     for(let i = 0; i < citySize; i++) {
         if(filterCity.children[i].selected) {
-            return filterCity.children[i].text;
+            return filterCity.children[i].text; // Return selected city
         }
     }
 }
 
 // Function that returns what conditions the user wants to filter by
 function getFilterCondition() {
+    // Blank array to hold conditions
     let filterConditions = [];
     // If new is checked
     if(document.getElementById("filter-condition-new").checked) {
@@ -259,13 +251,16 @@ function addDOM(postSection, postSize) {
     }
 }
 
+// Function to check and see if the filter text matches the post title
 function hasText(filterText, currText) {
+    // If filter text is empty
     if(filterText === "") {
         return true;
     } else {
+        // Set both texts to lower case
         cText = currText.toLowerCase();
         fText = filterText.toLowerCase();
-
+        // See if filter text is in current post text
         if(cText.search(fText) != -1) {
             return true;
         } else {
@@ -274,10 +269,13 @@ function hasText(filterText, currText) {
     }
 }
 
+// Function to check if current post price is over or equal to filter price
 function isOverMin(filterMin, currPrice) {
+    // If filter min price is empty
     if(filterMin === "") {
         return true;
     } else {
+        // Convert both values to ints and compare
         if(parseInt(currPrice) >= parseInt(filterMin)) {
             return true;
         } else {
@@ -286,10 +284,13 @@ function isOverMin(filterMin, currPrice) {
     }
 }
 
+// Function to check if current post price is under or equal to filter price
 function isUnderMax(filterMax, currPrice) {
+    // If filter max price is empty
     if(filterMax === "") {
         return true;
     } else {
+        // Convert both values to ints and compare
         if(parseInt(currPrice) <= parseInt(filterMax)) {
             return true;
         } else {
@@ -298,10 +299,13 @@ function isUnderMax(filterMax, currPrice) {
     }
 }
 
+// Function to check if the filter city and the current post city are equal
 function hasCity(filterCity, currCity) {
+    // If city is blank
     if(filterCity === "" || filterCity.toLowerCase() === "any") {
         return true;
     } else {
+        // Compare the lowercase filter city to the lower case current post city
         if(filterCity.toLowerCase() === currCity.toLowerCase()) {
             return true;
         } else {
@@ -310,13 +314,17 @@ function hasCity(filterCity, currCity) {
     }
 }
 
+// Function to check if the current post has one of the filter conditions
 function hasCondition(filterCondition, currCondition) {
+    // If the filter condition array is empty
     if(filterCondition.length === 0) {
         return true;
     } else {
         let hasCon = false;
+        // Check each condition and compare it to the current post condition
         for(let i = 0; i < filterCondition.length; i++) {
             let current = filterCondition[i];
+            // If there is a match, break, and return true
             if(current === currCondition) {
                 hasCon = true;
                 break;
@@ -339,10 +347,6 @@ function filterDOM() {
     let filterCity = getFilterCity();
     let filterCondition = [];
     filterCondition = getFilterCondition();
-
-    console.log(filterCondition);
-
-    console.log(filterText + ", " + filterMin + ", " + filterMax + ", " + filterCity + ", " + filterCondition);
     // Post section and size
     let postSection = document.getElementById("posts");
     let postSize = postSection.children.length;
@@ -360,19 +364,13 @@ function filterDOM() {
         let currCity = currPost.getAttribute("data-city");
         let currCondition = currPost.getAttribute("data-condition");
         // If data does not match, remove the post
-
-        // console.log(hasText(filterText, currText));
-        // console.log(isOverMin(filterMin, currPrice));
-        // console.log(isUnderMax(filterMax, currPrice));
-        // console.log(hasCity(filterCity, currCity));
-        //console.log(hasCondition(filterCondition, currCondition));
-
         if(!(hasText(filterText, currText) && isOverMin(filterMin, currPrice) && isUnderMax(filterMax, currPrice) && hasCity(filterCity, currCity) && hasCondition(filterCondition, currCondition))) {
             currPost.remove();
         }
     }
 }
 
+// Attaches a listener to the update button
 filterUpdate.addEventListener("click", function() {
     filterDOM();
 })
